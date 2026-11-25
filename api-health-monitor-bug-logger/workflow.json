@@ -1,0 +1,219 @@
+{
+  "name": "QA API Health Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "8c7cd452-84f9-4f37-9103-8509ab75a75f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://postman-echo.com/status/200",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "c268013f-cc30-4099-bdef-c60132660fd4",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "513b12d9-e6c7-4817-8443-5392afcf8a79",
+              "leftValue": "={{ $json.body.status }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        176,
+        0
+      ],
+      "id": "1d854c7c-787a-4dc2-9519-ec15e3db9318",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HYYe-mKk_zm3SIHQYeEtzuV2elQkKuKc6TwAM6BgIws",
+          "mode": "list",
+          "cachedResultName": "QA API Bug Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HYYe-mKk_zm3SIHQYeEtzuV2elQkKuKc6TwAM6BgIws/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HYYe-mKk_zm3SIHQYeEtzuV2elQkKuKc6TwAM6BgIws/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $('Schedule Trigger').item.json.timestamp }}",
+            "Endpoint": "https://postman-echo.com/status/200",
+            "Status_Code": "={{ $json.statusCode }}",
+            "Error_Message": "API Health Check Failed (500)",
+            "Severity": "High"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Endpoint",
+              "displayName": "Endpoint",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status_Code",
+              "displayName": "Status_Code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Error_Message",
+              "displayName": "Error_Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Severity",
+              "displayName": "Severity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        -96
+      ],
+      "id": "3b692f19-ab05-42c0-b2f0-f6eaca575bbb",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QM9V5GXFydDQIeeS",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5ab06cd2-0cc6-4e68-87c5-1d385c1a659c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c6c6e84b7eebb41c8425b96a3cee62b9327e34c057e73c25e68ad83048c68d33"
+  },
+  "nodeGroups": [],
+  "id": "W8HbHOnv8aVqCRq4",
+  "tags": []
+}
